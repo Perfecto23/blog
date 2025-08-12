@@ -1,0 +1,31 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "never",
+    "source.organizeImports": "never"
+  },
+  "prettier.prettierPath": "./node_modules/prettier/index.cjs",
+  "prettier.configPath": "./.prettierrc",
+  "prettier.requireConfig": true,
+  "eslint.enable": true,
+  "eslint.useFlatConfig": true,
+  "eslint.run": "onType",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "eslint.format.enable": false,
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className"
+  ],
+  "tailwindCSS.validate": true,
+}

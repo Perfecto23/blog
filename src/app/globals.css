@@ -1,0 +1,670 @@
+@import 'tailwindcss';
+@import '../styles/markdown.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  a {
+    @apply break-all;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply scroll-smooth;
+    scroll-padding-top: 80px; /* 为固定头部留出空间 */
+  }
+  /* 选择器：通用可点击元素的轻量聚焦环与颜色过渡 */
+  .u-focus-ring {
+    outline: none;
+    transition:
+      color 150ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+  /* 选择器：稳定图片显示，避免 CLS（与 width/height 搭配） */
+  .u-img-stable {
+    display: block;
+    object-fit: cover;
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  /* giscus 全局样式：保证 iframe 与容器占满宽度 */
+  iframe.giscus-frame {
+    width: 100%;
+  }
+}
+
+/* Custom Styles */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-morphism {
+  background: rgba(31, 41, 55, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #2563eb, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-hover {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 10px 10px -5px rgb(0 0 0 / 0.04);
+}
+
+/* Button Styles from Prototype */
+.btn-primary {
+  background: linear-gradient(135deg, #007aff, #0056cc);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(0, 122, 255, 0.08);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 122, 255, 0.12);
+  border-color: rgba(0, 122, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Page Animation */
+.page-enter {
+  animation: pageEnter 0.8s ease-out forwards;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation utilities */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-scale-in {
+  opacity: 0;
+  transform: scale(0.95);
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Skills bar animation */
+.skill-bar {
+  position: relative;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.skill-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  border-radius: 9999px;
+  transition: width 1.5s ease-in-out;
+  transform-origin: left center;
+}
+
+/* Enhanced typography */
+.prose {
+  @apply leading-relaxed text-gray-700;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  /* 选择器：Markdown 正文内的 h1-h4 标题统一加粗与深色 */
+  @apply font-bold text-gray-900;
+}
+
+/* 选择器：Markdown 正文内各级标题字号层级（移动优先） */
+.prose h1 {
+  @apply mt-8 mb-6 border-b border-gray-200 pb-3 text-3xl md:text-4xl;
+}
+
+.prose h2 {
+  @apply mt-8 mb-4 text-2xl md:text-3xl;
+}
+
+.prose h3 {
+  @apply mt-6 mb-3 text-xl md:text-2xl;
+}
+
+.prose h4 {
+  @apply mt-4 mb-2 text-lg;
+}
+
+.prose h5 {
+  @apply mt-4 mb-2 text-base font-semibold text-gray-900;
+}
+
+.prose h6 {
+  @apply mt-4 mb-2 text-sm font-medium text-gray-700;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+/* 选择器：文章正文内超长连续字符串/URL 的换行与局部滚动控制 */
+.prose,
+.prose p,
+.prose li,
+.prose blockquote,
+.prose code,
+.prose a,
+.markdown-content {
+  overflow-wrap: anywhere; /* 优先在任意位置断行，适配移动端超长 URL */
+  word-break: break-word; /* 兼容旧内核 */
+}
+
+/* 选择器：避免全局横向滚动，仅允许局部可滚动区域（如代码块）横向滚动 */
+html,
+body {
+  overflow-x: hidden;
+}
+
+.prose ul {
+  @apply list-inside list-disc space-y-2;
+}
+
+.prose ol {
+  @apply list-inside list-decimal space-y-2;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-blue-500 pl-4 text-gray-600 italic;
+}
+
+.prose code {
+  @apply rounded bg-gray-100 px-1 py-0.5 text-sm text-gray-800;
+}
+
+.prose pre {
+  @apply overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0 text-inherit;
+}
+
+/* Mobile improvements */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+
+  .glass-morphism {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+/* Markdown Content Styles */
+.markdown-content {
+  @apply leading-relaxed text-gray-700;
+}
+
+.markdown-content h1 {
+  @apply mt-8 mb-6 border-b border-gray-200 pb-3 text-3xl font-bold text-gray-900 md:text-4xl;
+}
+
+.markdown-content h2 {
+  @apply mt-8 mb-4 text-2xl font-bold text-gray-900 md:text-3xl;
+}
+
+.markdown-content h3 {
+  @apply mt-6 mb-3 text-xl font-bold text-gray-900 md:text-2xl;
+}
+
+.markdown-content h4 {
+  @apply mt-4 mb-2 text-lg font-bold text-gray-900;
+}
+
+.markdown-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  @apply mb-4 space-y-2 pl-6;
+}
+
+.markdown-content ul {
+  @apply list-disc;
+}
+
+.markdown-content ol {
+  @apply list-decimal;
+}
+
+.markdown-content li {
+  @apply leading-relaxed;
+}
+
+.markdown-content strong {
+  @apply font-semibold text-gray-900;
+}
+
+.markdown-content em {
+  @apply italic;
+}
+
+.markdown-content .markdown-link {
+  @apply text-blue-600 underline transition-colors hover:text-blue-700;
+}
+
+.markdown-content .markdown-blockquote {
+  @apply mb-4 rounded-r-lg border-l-4 border-blue-500 bg-blue-50 py-2 pl-4 text-gray-600 italic;
+}
+
+.markdown-content .markdown-image {
+  @apply my-8 text-center;
+}
+
+.markdown-content .markdown-image img {
+  @apply mx-auto h-auto max-w-full rounded-lg shadow-md;
+}
+
+.markdown-content .markdown-image figcaption {
+  @apply mt-2 text-sm text-gray-500 italic;
+}
+
+/* Code Blocks */
+.code-block-wrapper {
+  @apply mb-6 overflow-hidden rounded-lg border border-gray-200;
+}
+
+.code-block-header {
+  @apply flex items-center justify-between border-b border-gray-200 bg-gray-100 px-4 py-2 text-sm;
+}
+
+.code-language {
+  @apply font-medium text-gray-600;
+}
+
+.copy-button {
+  @apply cursor-pointer rounded bg-gray-200 px-2 py-1 text-xs transition-colors hover:bg-gray-300;
+}
+
+.copy-button.copied {
+  @apply bg-green-200 text-green-800;
+}
+
+.code-block {
+  @apply m-0 overflow-x-auto bg-gray-900 p-4 text-gray-100;
+}
+
+.code-block code {
+  @apply text-sm leading-relaxed;
+}
+
+/* Highlight.js Styles */
+.hljs {
+  @apply bg-gray-900 text-gray-100;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  @apply text-purple-400;
+}
+
+.hljs-string,
+.hljs-doctag {
+  @apply text-green-400;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-type,
+.hljs-tag {
+  @apply text-blue-400;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  @apply text-orange-400;
+}
+
+.hljs-comment,
+.hljs-quote {
+  @apply text-gray-500 italic;
+}
+
+.hljs-number,
+.hljs-regexp,
+.hljs-link {
+  @apply text-cyan-400;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  @apply text-yellow-400;
+}
+
+/* Table styles */
+.markdown-content table {
+  @apply my-6 w-full border-collapse border border-gray-300;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply border border-gray-300 px-4 py-2 text-left;
+}
+
+.markdown-content th {
+  @apply bg-gray-50 font-semibold;
+}
+
+/* Inline code */
+.markdown-content code:not([class*='language-']) {
+  @apply rounded bg-gray-100 px-1 py-0.5 font-mono text-sm text-gray-800;
+}
+
+/* Line clamp utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* TOC目录导航样式 */
+.toc-nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.toc-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.toc-nav::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+/* 博客内容页标题锚点样式 */
+h1[id],
+h2[id],
+h3[id],
+h4[id],
+h5[id],
+h6[id] {
+  scroll-margin-top: 100px;
+  position: relative;
+}
+
+/* 标题悬停显示锚点图标 */
+h1[id]:hover::before,
+h2[id]:hover::before,
+h3[id]:hover::before,
+h4[id]:hover::before,
+h5[id]:hover::before,
+h6[id]:hover::before {
+  content: '#';
+  position: absolute;
+  left: -1.5rem;
+  top: 0;
+  color: rgba(59, 130, 246, 0.6);
+  font-weight: normal;
+  transition: opacity 0.2s ease;
+}
+
+/* 移动端隐藏锚点图标 */
+@media (max-width: 768px) {
+  h1[id]:hover::before,
+  h2[id]:hover::before,
+  h3[id]:hover::before,
+  h4[id]:hover::before,
+  h5[id]:hover::before,
+  h6[id]:hover::before {
+    display: none;
+  }
+}
+
+/* 目录组件样式优化 */
+.toc-nav {
+  /* 自定义滚动条样式 */
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.7 0.05 200) transparent;
+}
+
+.toc-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.toc-nav::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.toc-nav::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0.05 200);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.toc-nav::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.6 0.08 200);
+}
+
+/* 目录项悬停效果 - 柔和的动画 */
+.toc-nav button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toc-nav button:hover {
+  transform: translateX(2px);
+}
+
+/* 确保目录容器高度计算正确 */
+@media (min-width: 1024px) {
+  /* 桌面端目录容器：内容自适应，限制最大高度，不再强制最小高度 */
+  .toc-container {
+    max-height: min(calc(100vh - 6rem), 48rem);
+  }
+
+  /* 当窗口很小时，进一步限制高度 */
+  @media (max-height: 600px) {
+    .toc-container {
+      max-height: calc(100vh - 12rem);
+    }
+  }
+
+  /* 当窗口很大时，设置合理的最大高度 */
+  @media (min-height: 1200px) {
+    .toc-container {
+      max-height: 45rem;
+    }
+  }
+}

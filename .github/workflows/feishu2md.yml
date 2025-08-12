@@ -1,0 +1,65 @@
+name: Sync Feishu Wiki to Content
+
+on:
+  schedule:
+    # 每天 北京时间 00:00 运行（GitHub Actions 使用 UTC，因此需设为 '0 16 * * *'）
+    - cron: '0 16 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    # 仅在 master 分支运行（适用于 schedule 与 workflow_dispatch）
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Ensure script executable
+        run: chmod +x bin/feishu2md-linux-amd64 || true
+
+      - name: Run Feishu -> content sync
+        env:
+          WIKI_URL: ${{ secrets.FEISHU_WIKI_URL }}
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+        run: |
+          if [ -z "${WIKI_URL}" ]; then
+            echo "::error::FEISHU_WIKI_URL Secret 未配置，无法执行同步。"
+            exit 1
+          fi
+          if [ -z "${FEISHU_APP_ID}" ] || [ -z "${FEISHU_APP_SECRET}" ]; then
+            echo "::error::缺少飞书应用凭据。请在仓库 Settings → Secrets and variables → Actions 中配置：FEISHU_APP_ID 与 FEISHU_APP_SECRET（推荐使用 Secrets）。"
+            exit 1
+          fi
+
+          echo "Using Feishu Wiki URL and app credentials from repository configuration."
+          export FEISHU_APP_ID
+          export FEISHU_APP_SECRET
+          bin/feishu2md-linux-amd64 -o content wiki-tree "$WIKI_URL"
+
+      - name: Commit and push to master if changes found
+        shell: bash
+        env:
+          TZ: UTC
+        run: |
+          set -e
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "Perfecto23"
+          git config user.email "kepengcheng314@163.com"
+          if [ -n "$(git status --porcelain content)" ]; then
+            echo "Changes detected in content. Committing..."
+            git add content
+            git commit -m "chore(content): sync Feishu wiki ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))"
+            # 处理潜在的非 fast-forward 情况
+            git pull --rebase origin master
+            git push origin HEAD:master
+          else
+            echo "No changes detected in content."
+          fi

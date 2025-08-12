@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache directories
+.cache/
+.parcel-cache/
+.nyc_output/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Generated files
+*.tsbuildinfo
+.eslintcache
+
+# Public assets (usually shouldn't be formatted)
+public/
+
+# Prototype folder (seems to be static HTML)
+prototype/
+
+# Content files that might have specific formatting
+content/
+
+# Configuration files that should maintain their format
+pnpm-lock.yaml
+
+# HTML files to preserve original formatting
+index.html

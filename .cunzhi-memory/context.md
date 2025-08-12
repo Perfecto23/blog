@@ -2,7 +2,7 @@
 
 ## 基本信息
 
-- **项目名称**: blog（个人技术网站 - 柯芃丞）
+- **项目名称**: blog
 - **技术栈**: Next.js 15 (App Router) + React 19 + TypeScript 5 + Tailwind CSS 4 + Shadcn UI + Radix UI + Lucide Icons
 - **内容来源**: `content/` 目录下的 `.md/.mdx` 文件（多级目录，带数字前缀用于排序与分组）
 - **语言与站点**: 中文为主（`<html lang="zh-CN">`），站点地址取自 `siteConfig.url`（当前为 `https://itmirror.top`）
