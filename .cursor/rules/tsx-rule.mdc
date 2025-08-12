@@ -1,0 +1,16 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+
+# Your rule content
+
+- 参考最新的 Next.js 15 的文档
+- 引入新的依赖的时候需要考虑当前框架为pnpm + postcss + tailwind4 + nextjs15
+- 编写代码的时候需要给代码添加完备的注释
+  - 函数的作用
+  - 入参和出参的作用
+  - 模块描述
+  - 判断逻辑
+  - 接口描述

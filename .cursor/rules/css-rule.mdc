@@ -1,0 +1,12 @@
+---
+description: 
+globs: *.tsx,*.css
+alwaysApply: false
+---
+
+# Your rule content
+
+- 参考最新的 tailwindcss 4 的文档
+- 使用选择器定义样式的时候，需要注释说明这个选择器是给什么元素设置样式
+- 响应式布局支持移动端页面展示
+- 尽可能的给你添加样式的这个元素加上对应的交互动画，要丝滑柔和不突兀
