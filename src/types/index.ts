@@ -52,7 +52,10 @@ export interface SiteConfig {
   };
   seo: {
     keywords: string[];
+    ogImage: string;
   };
+  locale: string;
+  themeColor: string;
 }
 
 export interface ContactInfo {

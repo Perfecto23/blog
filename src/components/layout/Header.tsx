@@ -20,15 +20,12 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className='glass-morphism fixed top-0 z-50 w-full transition-all duration-300'>
-      <nav className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='flex h-16 items-center justify-between'>
+    <header className='fixed top-0 z-50 w-full transition-all duration-300 glass-morphism'>
+      <nav className='px-4 mx-auto max-w-7xl sm:px-6 lg:px-8'>
+        <div className='flex justify-between items-center h-16'>
           {/* Logo */}
           <div className='flex items-center space-x-3'>
             <Logo size='md' className='transition-transform duration-300 hover:scale-110' />
-            <Link href='/' className='gradient-text text-lg font-semibold'>
-              {siteConfig.author.name}
-            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -41,7 +38,7 @@ export function Header() {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'relative text-sm font-medium transition-colors duration-200',
+                    'relative text-base font-medium transition-colors duration-200',
                     isActive ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
                   )}
                 >
@@ -55,7 +52,7 @@ export function Header() {
           {/* Mobile menu button */}
           <div className='md:hidden'>
             <Button variant='ghost' size='sm' onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className='p-2'>
-              {mobileMenuOpen ? <X className='h-6 w-6' /> : <Menu className='h-6 w-6' />}
+              {mobileMenuOpen ? <X className='w-6 h-6' /> : <Menu className='w-6 h-6' />}
             </Button>
           </div>
         </div>
@@ -63,7 +60,7 @@ export function Header() {
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className='md:hidden'>
-            <div className='mt-2 space-y-1 rounded-lg border border-gray-200 bg-white/95 px-2 pt-2 pb-3 backdrop-blur-sm sm:px-3'>
+            <div className='px-2 pt-2 pb-3 mt-2 space-y-1 rounded-lg border border-gray-200 backdrop-blur-sm bg-white/95 sm:px-3'>
               {navigation.map(item => {
                 const isActive = pathname === item.href || (item.href === '/blog' && pathname.startsWith('/blog'));
 
@@ -72,8 +69,8 @@ export function Header() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      'block rounded-md px-3 py-2 text-base font-medium transition-colors duration-200',
-                      isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                      'block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200',
+                      isActive ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
                     )}
                     onClick={() => setMobileMenuOpen(false)}
                   >

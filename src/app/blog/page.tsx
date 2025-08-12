@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock, Tag } from 'lucide-react';
 import { CategoryHierarchy } from '@/components/blog/CategoryHierarchy';
+import { SortSelect } from '@/components/blog/SortSelect';
 import { Breadcrumb } from '@/components/common/Breadcrumb';
 import { Container } from '@/components/common/Container';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -22,26 +23,47 @@ export const revalidate = 3600;
 interface BlogPageProps {
   searchParams: Promise<{
     category?: string;
+    sort?: 'views_desc' | 'views_asc' | 'date_desc' | 'date_asc' | string;
   }>;
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const { category } = await searchParams;
+  const { category, sort } = await searchParams;
   const allPosts = getAllPosts();
   const categories = getAllCategories();
 
   // 根据分类筛选文章
   const posts = category ? getPostsByCategory(category) : allPosts;
 
-  // 批量获取阅读量并按阅读量降序排序；阅读量相同则按日期降序
-  const slugs = posts.map(p => p.slug);
-  const batchViews = await viewsUtils.getBatchArticleViews(slugs);
-  const sortedPosts = [...posts].sort((a, b) => {
-    const va = batchViews[a.slug] ?? 0;
-    const vb = batchViews[b.slug] ?? 0;
-    if (vb !== va) return vb - va;
-    return a.date > b.date ? -1 : 1;
-  });
+  // 根据查询参数执行排序
+  const sortParam = (sort as string) || 'views_desc';
+  let sortedPosts = posts as typeof posts;
+
+  if (sortParam === 'views_desc' || sortParam === 'views_asc') {
+    // 批量获取阅读量并按阅读量排序；并以日期降序作为次级排序
+    const slugs = posts.map(p => p.slug);
+    const batchViews = await viewsUtils.getBatchArticleViews(slugs);
+    const isAsc = sortParam === 'views_asc';
+    sortedPosts = [...posts].sort((a, b) => {
+      const va = batchViews[a.slug] ?? 0;
+      const vb = batchViews[b.slug] ?? 0;
+      if (va !== vb) return isAsc ? va - vb : vb - va;
+      return a.date > b.date ? -1 : 1;
+    });
+  } else if (sortParam === 'date_asc' || sortParam === 'date_desc') {
+    const byDateDesc = [...posts].sort((a, b) => (a.date > b.date ? -1 : 1));
+    sortedPosts = sortParam === 'date_desc' ? byDateDesc : byDateDesc.reverse();
+  } else {
+    // 默认：阅读量降序
+    const slugs = posts.map(p => p.slug);
+    const batchViews = await viewsUtils.getBatchArticleViews(slugs);
+    sortedPosts = [...posts].sort((a, b) => {
+      const va = batchViews[a.slug] ?? 0;
+      const vb = batchViews[b.slug] ?? 0;
+      if (vb !== va) return vb - va;
+      return a.date > b.date ? -1 : 1;
+    });
+  }
 
   // 生成面包屑导航
   const breadcrumbItems = category
@@ -102,7 +124,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         <Container size='xl'>
           <div className='px-4 mx-auto max-w-7xl sm:px-6'>
             {/* 面包屑导航 */}
-            <div className='mb-8'>
+            <div className='mb-4'>
               <Breadcrumb items={breadcrumbItems} />
             </div>
 
@@ -125,7 +147,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   </div>
                 ) : (
                   <>
-                    <div className='flex justify-between items-center mb-8'>
+                    <div className='flex justify-between items-center mb-4'>
                       <h2 className='flex gap-3 items-center text-xl font-bold text-gray-900'>
                         {category ? (
                           <>
@@ -143,6 +165,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                           </>
                         )}
                       </h2>
+
+                      <SortSelect currentSort={sortParam} category={category} />
                     </div>
 
                     <div className='grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-2'>

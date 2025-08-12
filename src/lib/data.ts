@@ -2,13 +2,14 @@ import type { ContactInfo, SiteConfig, Skill, WorkExperience } from '@/types';
 
 export const siteConfig: SiteConfig = {
   name: '柯芃丞',
-  title: '柯芃丞 - 前端工程师',
-  description: '专注现代Web开发技术的前端工程师，热爱学习和分享，致力于创造优秀的用户体验。',
+  title: '柯芃丞 - 前端工程师 | 技术分享与实践',
+  description:
+    '我是一位专注现代Web开发技术的前端工程师，在这里分享Vue/React、TypeScript、性能优化等领域的学习笔记和项目实践。',
   url: 'https://itmirror.top',
   author: {
     name: '柯芃丞',
     email: 'kepengcheng314@163.com',
-    bio: '3年经验的前端工程师，专注于现代Web技术栈，包括Vue.js、TypeScript、性能优化等领域。',
+    bio: '你好，我是柯芃丞。一名热爱开源、追求代码美学的前端工程师。享受用技术解决问题的过程，乐于分享知识与经验。',
     social: {
       github: 'https://github.com/Perfecto23',
       linkedin: 'https://www.linkedin.com/in/%E8%8A%83%E4%B8%9E-%E6%9F%AF-953759379/',
@@ -16,19 +17,34 @@ export const siteConfig: SiteConfig = {
   },
   seo: {
     keywords: [
-      '前端工程师',
-      'Vue.js',
-      'TypeScript',
-      'React',
-      'Next.js',
-      '性能优化',
+      '前端开发',
       'Web开发',
-      '用户体验',
       'JavaScript',
-      'CSS',
-      'HTML',
+      'TypeScript',
+      'Vue.js',
+      'React.js',
+      'Next.js',
+      'Nuxt.js',
+      'Vite',
+      'Webpack',
+      'Node.js',
+      'Tailwind CSS',
+      'Web性能优化',
+      'Web Vitals',
+      '用户体验',
+      '柯芃丞',
+      'IT Mirror',
+      '技术博客',
+      '前端工程师',
+      '个人网站',
     ],
+    // 建议为您网站设计一个专属的分享卡片图片，尺寸通常为 1200x630px
+    ogImage: 'https://itmirror.top/og-default.svg',
   },
+
+  // 增加的配置
+  locale: 'zh-CN', // 'zh-CN' 代表简体中文
+  themeColor: '#ffffff', // 网站的主题色，例如白色
 };
 
 export const workExperience: WorkExperience[] = [

@@ -12,7 +12,7 @@ export const runtime = 'edge';
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get('title') || '柯芃丞 - 前端工程师';
+  const title = searchParams.get('title') || '柯芃丞 - 前端工程师 | 技术分享与实践';
   const subtitle = searchParams.get('subtitle') || '';
   const badge = searchParams.get('badge') || '';
 
