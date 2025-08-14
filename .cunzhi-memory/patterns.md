@@ -46,3 +46,4 @@
 ## 命名与可维护性
 
 - 文件夹使用小写短横线；组件与函数使用完整语义命名；避免 1-2 字母短名；导出类型集中在 `src/types`。
+- Google Search Console SEO问题解决最佳实践：1. 重定向链优化-在middleware.ts中一次性处理www到裸域和HTTP到HTTPS重定向，避免多次跳转；2. canonical URL规范化-首页使用空路径确保裸域，子页面规范化路径格式；3. 重复内容防护-在next.config.ts中配置/index和/home到根路径的永久重定向；4. robots.txt优化-禁止爬取/_next/、静态资源文件(.woff,.css,.js等)，专注内容索引；5. sitemap URL格式统一-确保与canonical URL格式保持一致。这套方案可解决"网页重定向"、"重复网页未选定规范"、"已抓取尚未编入索引"等常见GSC问题。

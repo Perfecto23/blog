@@ -7,11 +7,26 @@ function generateNonce(): string {
 }
 
 export function middleware(request: NextRequest) {
-  // 301: www 子域统一到裸域 itmirror.top
   const host = request.headers.get('host') || '';
+  const url = new URL(request.nextUrl);
+
+  // 优化重定向逻辑：一次性处理 www + HTTPS 重定向
+  let needsRedirect = false;
+
+  // 1. 处理 www 子域 -> 裸域
   if (host.startsWith('www.')) {
-    const url = new URL(request.nextUrl);
     url.hostname = host.replace(/^www\./, '');
+    needsRedirect = true;
+  }
+
+  // 2. 强制 HTTPS（仅在生产环境）
+  if (process.env.NODE_ENV === 'production' && url.protocol === 'http:') {
+    url.protocol = 'https:';
+    needsRedirect = true;
+  }
+
+  // 执行重定向（一次性处理所有重定向需求）
+  if (needsRedirect) {
     return NextResponse.redirect(url, 301);
   }
 

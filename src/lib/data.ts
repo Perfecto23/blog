@@ -2,9 +2,8 @@ import type { ContactInfo, SiteConfig, Skill, WorkExperience } from '@/types';
 
 export const siteConfig: SiteConfig = {
   name: '柯芃丞',
-  title: '柯芃丞 - 前端工程师 | 技术分享与实践',
-  description:
-    '我是一位专注现代Web开发技术的前端工程师，在这里分享Vue/React、TypeScript、性能优化等领域的学习笔记和项目实践。',
+  title: '柯芃丞 - 前端开发与工程实践',
+  description: '专注现代Web开发技术的前端工程师，分享Vue/React、TypeScript、工程化等领域的实战经验与技术洞察。',
   url: 'https://itmirror.top',
   author: {
     name: '柯芃丞',

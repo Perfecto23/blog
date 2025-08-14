@@ -9,10 +9,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = siteConfig.url;
   const currentDate = new Date();
 
-  // 静态页面
+  // 静态页面 - 确保首页URL为裸域（无尾随斜杠）
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
+      url: baseUrl, // 使用裸域作为首页canonical URL
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 1.0,

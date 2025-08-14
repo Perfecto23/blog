@@ -101,6 +101,29 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // SEO 重定向优化：处理重复内容问题
+  async redirects() {
+    return [
+      // 处理尾随斜杠一致性 - 移除非根路径的尾随斜杠
+      {
+        source: '/((?!_next|api|static|favicon|robots|sitemap|security|manifest).*[^/])/',
+        destination: '/$1',
+        permanent: true,
+      },
+      // 处理可能的重复首页路径
+      {
+        source: '/index',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 // Bundle analyzer configuration

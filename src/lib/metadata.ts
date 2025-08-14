@@ -61,7 +61,9 @@ export function generateSEO({
   if (category) params.set('badge', category);
   const dynamicOg = `${siteConfig.url}/api/og?${params.toString()}`;
   const seoImage = image || (title ? dynamicOg : '/og-default.svg');
-  const url = `${siteConfig.url}${path}`;
+  // 规范化路径：确保根路径为空字符串，避免重复内容
+  const normalizedPath = path === '/' ? '' : path;
+  const url = `${siteConfig.url}${normalizedPath}`;
   const pageKeywords = getPageKeywords(path, tags);
 
   const metadata: Metadata = {
@@ -77,7 +79,7 @@ export function generateSEO({
       apple: '/favicon.svg',
     },
     alternates: {
-      canonical: url,
+      canonical: url, // 规范URL：首页使用裸域，子页面使用完整路径
     },
     verification: {
       google: 'DhzPxbXZA3AtTE2OTTqILI9FwRQVM6PCWDUjaI2LBCo',
@@ -125,6 +127,8 @@ export function generateSEO({
       'format-detection': 'telephone=no',
       'msapplication-tap-highlight': 'no',
       'theme-color': '#ffffff',
+      // 添加额外的canonical信号
+      'rel:canonical': url,
     },
   };
 
