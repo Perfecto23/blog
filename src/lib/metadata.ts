@@ -124,8 +124,10 @@ export function generateSEO({
       'og:locale:alternate': 'en_US',
       'apple-mobile-web-app-capable': 'yes',
       'apple-mobile-web-app-status-bar-style': 'default',
+      'apple-mobile-web-app-title': siteConfig.name,
       'format-detection': 'telephone=no',
       'msapplication-tap-highlight': 'no',
+      'mobile-web-app-capable': 'yes',
       'theme-color': '#ffffff',
       // 添加额外的canonical信号
       'rel:canonical': url,

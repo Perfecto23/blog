@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import Script from 'next/script';
 import { AnalyticsProvider } from '@/components/common/AnalyticsProvider';
 import { PerformanceMonitor } from '@/components/common/PerformanceMonitor';
+import { ProductionSEOMonitor, SEOMonitorWidget } from '@/components/common/SEOMonitor';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { GA_TRACKING_ID } from '@/lib/analytics';
@@ -79,9 +80,11 @@ export default async function RootLayout({
 
         <AnalyticsProvider>
           <PerformanceMonitor />
+          <ProductionSEOMonitor />
           <Header />
           <main className='flex-1 pt-16'>{children}</main>
           <Footer />
+          <SEOMonitorWidget />
         </AnalyticsProvider>
       </body>
     </html>

@@ -18,7 +18,7 @@ export async function Hero() {
       }}
       title='你好，我是'
       highlightText={siteConfig.author.name}
-      subtitle='前端工程师 · 技术博主 · 开源贡献者'
+      subtitle='前端工程师 · 博客作者 · 开源贡献者'
       description='专注于现代 Web 开发技术，热衷于性能优化和工程化实践。通过代码创造优秀的用户体验，用技术文章分享开发心得。'
     >
       {/* Key Skills */}
