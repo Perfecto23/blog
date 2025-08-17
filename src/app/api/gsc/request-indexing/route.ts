@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { google } from 'googleapis';
 
 /**
  * Google Search Console 索引请求API
@@ -6,10 +7,28 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function POST(request: NextRequest) {
   try {
-    const { urls } = await request.json();
+    const { urls, paths } = await request.json();
 
-    if (!urls || !Array.isArray(urls)) {
-      return NextResponse.json({ error: 'URLs数组是必需的' }, { status: 400 });
+    // 支持两种输入方式：完整URL数组 或 路径数组
+    let urlsToIndex: string[] = [];
+
+    if (urls && Array.isArray(urls)) {
+      urlsToIndex = urls;
+    } else if (paths && Array.isArray(paths)) {
+      // 从路径生成完整URL
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://itmirror.top';
+      urlsToIndex = paths.map(path => `${baseUrl}/blog/${path}`);
+    } else {
+      return NextResponse.json(
+        {
+          error: 'urls数组或paths数组是必需的',
+          usage: {
+            urls: ['https://example.com/page1', 'https://example.com/page2'],
+            paths: ['article-slug-1', 'article-slug-2'],
+          },
+        },
+        { status: 400 }
+      );
     }
 
     // 验证环境变量
@@ -20,30 +39,97 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Google Search Console API配置缺失' }, { status: 500 });
     }
 
-    // 注意：这里需要实现Google APIs的OAuth2认证
-    // 当前为模拟实现，真实实现需要：
-    // 1. npm install googleapis
-    // 2. 实现JWT认证流程
-    // 3. 调用Google Indexing API
+    try {
+      // 处理私钥格式
+      let formattedPrivateKey = privateKey;
+      if (formattedPrivateKey.includes('\\n')) {
+        formattedPrivateKey = formattedPrivateKey.replace(/\\n/g, '\n');
+      }
 
-    // 临时响应（在真实实现前）
-    const results = urls.map((url: string) => ({
-      url,
-      success: true,
-      message: '索引请求已提交（模拟）',
-      timestamp: new Date().toISOString(),
-    }));
+      // 确保私钥格式正确
+      if (!formattedPrivateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+        throw new Error('私钥格式不正确，必须包含完整的 PEM 格式');
+      }
 
-    console.log('索引请求:', { urls, timestamp: new Date().toISOString() });
+      // 创建JWT认证客户端
+      const auth = new google.auth.JWT({
+        email: serviceAccountEmail,
+        key: formattedPrivateKey,
+        scopes: ['https://www.googleapis.com/auth/indexing'],
+      });
 
-    return NextResponse.json({
-      success: true,
-      results,
-      message: `已处理${urls.length}个URL的索引请求`,
-    });
+      // 验证认证
+      await auth.authorize();
+
+      // 创建Indexing API客户端
+      const indexing = google.indexing({ version: 'v3', auth });
+
+      const results = [];
+
+      // 逐个提交URL索引请求
+      for (const url of urlsToIndex) {
+        try {
+          const response = await indexing.urlNotifications.publish({
+            requestBody: {
+              url,
+              type: 'URL_UPDATED', // 或 'URL_DELETED'
+            },
+          });
+
+          results.push({
+            url,
+            success: true,
+            message: '索引请求已提交',
+            timestamp: new Date().toISOString(),
+            googleResponse: response.data,
+          });
+
+          console.log(`索引请求成功: ${url}`, response.data);
+        } catch (urlError) {
+          console.error(`索引请求失败: ${url}`, (urlError as Error).message);
+
+          results.push({
+            url,
+            success: false,
+            message: `索引请求失败: ${(urlError as Error).message}`,
+            timestamp: new Date().toISOString(),
+            error: (urlError as Error).message,
+          });
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+
+      return NextResponse.json({
+        success: successCount > 0,
+        results,
+        message: `已处理${urlsToIndex.length}个URL的索引请求，成功${successCount}个`,
+        summary: {
+          total: urlsToIndex.length,
+          success: successCount,
+          failed: urlsToIndex.length - successCount,
+        },
+      });
+    } catch (authError) {
+      console.error('Google API认证失败:', authError);
+      return NextResponse.json(
+        {
+          error: 'Google API认证失败',
+          details: (authError as Error).message,
+          suggestion: '请检查服务账号配置和权限设置',
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('索引请求失败:', error);
-    return NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: '服务器内部错误',
+        details: (error as Error).message,
+      },
+      { status: 500 }
+    );
   }
 }
 

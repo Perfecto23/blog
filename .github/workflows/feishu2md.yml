@@ -1,4 +1,4 @@
-name: Sync Feishu Wiki to Content
+name: Sync Feishu Wiki to Content (with Auto Indexing)
 
 on:
   schedule:
@@ -45,6 +45,7 @@ jobs:
           bin/feishu2md-linux-amd64 -o content wiki-tree "$WIKI_URL"
 
       - name: Commit and push to master if changes found
+        id: commit
         shell: bash
         env:
           TZ: UTC
@@ -60,6 +61,110 @@ jobs:
             # 处理潜在的非 fast-forward 情况
             git pull --rebase origin master
             git push origin HEAD:master
+            echo "has_changes=true" >> $GITHUB_OUTPUT
           else
             echo "No changes detected in content."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
+
+                  # 🚀 新增：如果有内容变更，直接在GitHub Action中检测变更并提交索引请求
+      - name: Auto index new articles
+        if: steps.commit.outputs.has_changes == 'true'
+        run: |
+          echo "🚀 检测到内容更新，开始自动索引流程..."
+
+          # 在GitHub Action中直接检测文件变更（有完整的git历史）
+          echo "🔍 检测变更的文章..."
+
+          # 获取新增和修改的markdown文件
+          changed_files=$(git diff --name-status HEAD~1..HEAD -- content/ | grep -E '^[AM]\s+.*\.md$' | grep -v '\.md\.rev$' || true)
+
+          if [ -z "$changed_files" ]; then
+            echo "ℹ️ 没有检测到Markdown文章变更"
+            exit 0
+          fi
+
+          # 转换为文章路径（slug），与本地脚本保持一致
+          article_paths=()
+
+          # Slug化函数（与MDX库保持一致）
+          slugify_segment() {
+            echo "$1" | sed 's/^[0-9]*\. *//' | sed 's/[^a-zA-Z0-9\u4e00-\u9fa5]/-/g' | sed 's/-\+/-/g' | sed 's/^-\|-$//g' | tr '[:upper:]' '[:lower:]'
+          }
+
+          while IFS= read -r line; do
+            if [ -n "$line" ]; then
+              # 提取文件路径：A content/xxx.md -> xxx.md
+              file_path=$(echo "$line" | sed 's/^[AM]\s*//' | sed 's/^content\///')
+              
+              # 过滤掉图片目录和占位文档
+              if [[ "$file_path" != *"/img/"* && "$file_path" != *"空文档占位"* ]]; then
+                # 生成slug：处理目录和文件名
+                slug_parts=""
+                IFS='/' read -ra PATH_PARTS <<< "${file_path%.*}"
+                for part in "${PATH_PARTS[@]}"; do
+                  if [ -n "$part" ]; then
+                    slugified=$(slugify_segment "$part")
+                    if [ -n "$slug_parts" ]; then
+                      slug_parts="$slug_parts/$slugified"
+                    else
+                      slug_parts="$slugified"
+                    fi
+                  fi
+                done
+                
+                if [ -n "$slug_parts" ]; then
+                  article_paths+=("$slug_parts")
+                  echo "  📄 $slug_parts"
+                fi
+              fi
+            fi
+          done <<< "$changed_files"
+
+          if [ ${#article_paths[@]} -eq 0 ]; then
+            echo "ℹ️ 没有检测到需要索引的有效文章"
+            exit 0
+          fi
+
+          echo "📝 发现 ${#article_paths[@]} 篇文章需要索引"
+
+          # 构建JSON数组
+          paths_json="["
+          for i in "${!article_paths[@]}"; do
+            if [ $i -gt 0 ]; then
+              paths_json+=","
+            fi
+            paths_json+="\"${article_paths[$i]}\""
+          done
+          paths_json+="]"
+
+          # 提交索引请求
+          echo "📤 向 Google 提交索引请求..."
+          index_response=$(curl -s -X POST "https://itmirror.top/api/gsc/request-indexing" \
+            -H "Content-Type: application/json" \
+            -d "{\"paths\": $paths_json}" \
+            --max-time 120 \
+            --retry 3 \
+            --retry-delay 10)
+
+          # 检查索引结果
+          if [ $? -eq 0 ] && echo "$index_response" | grep -q '"success":true'; then
+            # 提取统计信息
+            total=$(echo "$index_response" | grep -o '"total":[0-9]*' | grep -o '[0-9]*')
+            success=$(echo "$index_response" | grep -o '"success":[0-9]*' | tail -1 | grep -o '[0-9]*')
+            
+            echo "✅ 文章索引请求提交成功！"
+            echo "📊 索引结果: 成功提交 ${success:-0}/${total:-0} 篇文章到 Google"
+            echo "🎉 索引请求已提交！Google 将在稍后处理这些索引请求。"
+          else
+            echo "⚠️ 索引请求提交失败，这不影响内容同步"
+            echo "🔍 API 响应: $index_response"
+            echo "💡 可稍后手动运行: node scripts/index-articles.js auto"
+          fi
+
+      # 即使没有内容变更，也记录一下状态
+      - name: No changes detected
+        if: steps.commit.outputs.has_changes == 'false'
+        run: |
+          echo "ℹ️ 本次同步未发现内容变更，跳过索引步骤"
+          echo "💡 如需手动检查索引状态: node scripts/index-articles.js status"
