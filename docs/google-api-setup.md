@@ -20,6 +20,7 @@ gcloud services enable webmasters.googleapis.com
 ```
 
 或通过界面启用：
+
 - Google Indexing API
 - Search Console API
 - Web Search Indexing API
@@ -86,11 +87,10 @@ async function testGSCConnection() {
     );
 
     const indexing = google.indexing({ version: 'v3', auth });
-    
+
     // 测试获取配额信息
     const quota = await indexing.urlNotifications.getMetadata();
     console.log('✅ GSC API连接成功!', quota.data);
-    
   } catch (error) {
     console.error('❌ GSC API连接失败:', error);
   }
@@ -102,6 +102,7 @@ testGSCConnection();
 ## 📊 第七步：SEO监控面板使用
 
 ### 开发环境
+
 ```bash
 npm run dev
 # 访问任意页面，右下角会出现📊按钮
@@ -109,6 +110,7 @@ npm run dev
 ```
 
 ### 生产环境
+
 ```bash
 npm run build && npm start
 # SEO数据会自动收集并发送到Google Analytics
@@ -143,14 +145,17 @@ curl -X POST https://itmirror.top/api/gsc/request-indexing \
 ### 常见错误及解决方案
 
 **403 Forbidden**
+
 - 检查服务账号是否在Search Console中有权限
 - 确认API已启用
 
 **400 Bad Request**
+
 - 检查URL格式是否正确
 - 确认网站已在Search Console中验证
 
 **401 Unauthorized**
+
 - 检查服务账号邮箱和私钥是否正确
 - 确认私钥格式中的换行符处理
 

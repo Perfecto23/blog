@@ -342,3 +342,117 @@ export const seoMetrics = {
     };
   },
 };
+
+// SEO 数据收集和分析
+export const seoDataCollection = {
+  // 收集当前页面的SEO数据
+  collectPageSEOData: () => {
+    if (typeof window === 'undefined') return null;
+
+    const currentUrl = window.location.href;
+    const title = document.title;
+    const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+
+    // 收集所有标题
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(h => ({
+      level: parseInt(h.tagName.charAt(1)),
+      text: h.textContent?.trim() || '',
+    }));
+
+    // 收集图片信息
+    const images = Array.from(document.querySelectorAll('img')).map(img => ({
+      src: img.src,
+      alt: img.alt,
+      hasAlt: !!img.alt,
+      isLazy: img.loading === 'lazy',
+    }));
+
+    // 收集链接信息
+    const allLinks = Array.from(document.querySelectorAll('a[href]'));
+    const internalLinks = allLinks
+      .filter(link => {
+        const href = link.getAttribute('href');
+        return href && (href.startsWith('/') || href.includes(window.location.hostname));
+      })
+      .map(link => ({
+        href: link.getAttribute('href') || '',
+        text: link.textContent?.trim() || '',
+      }));
+
+    const externalLinks = allLinks
+      .filter(link => {
+        const href = link.getAttribute('href');
+        return href && !href.startsWith('/') && !href.includes(window.location.hostname) && href.startsWith('http');
+      })
+      .map(link => ({
+        href: link.getAttribute('href') || '',
+        text: link.textContent?.trim() || '',
+      }));
+
+    // 计算页面文字数量
+    const bodyText = document.body.textContent || '';
+    const wordCount = bodyText.trim().split(/\s+/).length;
+
+    return {
+      url: currentUrl,
+      title,
+      description,
+      headings,
+      images,
+      internalLinks,
+      externalLinks,
+      wordCount,
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString(),
+    };
+  },
+
+  // 发送SEO数据到收集API
+  sendSEOData: async () => {
+    const data = seoDataCollection.collectPageSEOData();
+    if (!data) return null;
+
+    try {
+      const response = await fetch('/api/seo/collect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`SEO数据发送失败: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // 如果有分析结果，发送GA事件
+      if (result.analysis && typeof window.gtag === 'function') {
+        event({
+          action: 'seo_analysis_completed',
+          category: 'SEO',
+          label: data.url,
+          value: result.analysis.score,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      console.warn('SEO数据收集失败:', error);
+      return null;
+    }
+  },
+
+  // 自动收集SEO数据（页面加载完成后）
+  autoCollectSEOData: () => {
+    if (typeof window === 'undefined') return;
+
+    // 页面加载完成后延迟收集，确保所有内容都已渲染
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        seoDataCollection.sendSEOData();
+      }, 2000); // 延迟2秒收集
+    });
+  },
+};

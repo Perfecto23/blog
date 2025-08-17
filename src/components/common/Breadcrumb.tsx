@@ -112,16 +112,16 @@ export function Breadcrumb({ items: customItems, className = '' }: BreadcrumbPro
         <ol className='flex items-center space-x-2 text-gray-500'>
           {items.map((item, index) => (
             <li key={item.url} className='flex items-center'>
-              {index > 0 && <ChevronRight className='mx-2 w-4 h-4 text-gray-400' aria-hidden='true' />}
+              {index > 0 && <ChevronRight className='mx-2 h-4 w-4 text-gray-400' aria-hidden='true' />}
 
               {item.current ? (
                 <span className='font-medium text-gray-900' aria-current='page'>
-                  {index === 0 && <Home className='inline mr-1 w-4 h-4' aria-hidden='true' />}
+                  {index === 0 && <Home className='mr-1 inline h-4 w-4' aria-hidden='true' />}
                   {item.name}
                 </span>
               ) : (
                 <Link href={item.url} className='transition-colors duration-200 hover:text-gray-700'>
-                  {index === 0 && <Home className='inline mr-1 w-4 h-4' aria-hidden='true' />}
+                  {index === 0 && <Home className='mr-1 inline h-4 w-4' aria-hidden='true' />}
                   {item.name}
                 </Link>
               )}

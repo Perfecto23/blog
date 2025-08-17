@@ -91,7 +91,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* 两栏布局 */}
           <div className='flex gap-6 lg:gap-8 xl:gap-12'>
             {/* 主内容区 */}
-            <div className='flex-1 min-w-0'>
+            <div className='min-w-0 flex-1'>
               {/* 面包屑导航 */}
               <div className='mb-4'>
                 <BlogBreadcrumb category={post.category} title={post.title} slug={post.slug} />
@@ -101,7 +101,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <div className='mb-6'>
                 <Button variant='ghost' asChild className='text-gray-600 hover:text-gray-900'>
                   <Link href='/blog' className='inline-flex items-center'>
-                    <ArrowLeft className='mr-2 w-4 h-4' />
+                    <ArrowLeft className='mr-2 h-4 w-4' />
                     返回博客列表
                   </Link>
                 </Button>
@@ -110,21 +110,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               {/* Article Header */}
               <header className='mb-8'>
                 {/* Meta Info */}
-                <div className='flex flex-wrap gap-4 items-center mb-6 text-sm text-gray-500'>
-                  <div className='flex gap-1 items-center'>
-                    <Calendar className='w-4 h-4' />
+                <div className='mb-6 flex flex-wrap items-center gap-4 text-sm text-gray-500'>
+                  <div className='flex items-center gap-1'>
+                    <Calendar className='h-4 w-4' />
                     <time dateTime={post.date}>{post.date}</time>
                   </div>
-                  <div className='flex gap-1 items-center'>
-                    <Clock className='w-4 h-4' />
+                  <div className='flex items-center gap-1'>
+                    <Clock className='h-4 w-4' />
                     <span>{post.readingTime}</span>
                   </div>
                   <ViewCounter slug={post.slug} size='md' />
-                  <div className='flex gap-2 items-center'>
-                    <Tag className='w-4 h-4 text-blue-600' />
+                  <div className='flex items-center gap-2'>
+                    <Tag className='h-4 w-4 text-blue-600' />
                     <Link
                       href={`/blog?category=${encodeURIComponent(post.category)}`}
-                      className='px-2 py-1 text-blue-600 bg-blue-50 rounded-full transition-colors hover:bg-blue-100'
+                      className='rounded-full bg-blue-50 px-2 py-1 text-blue-600 transition-colors hover:bg-blue-100'
                     >
                       {post.category}
                     </Link>
@@ -132,15 +132,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
 
                 {/* Title */}
-                <h1 className='mb-6 text-4xl font-bold leading-tight text-gray-900 md:text-5xl'>{post.title}</h1>
+                <h1 className='mb-6 text-4xl leading-tight font-bold text-gray-900 md:text-5xl'>{post.title}</h1>
 
                 {/* Tags */}
-                <div className='flex flex-wrap gap-2 mb-8'>
+                <div className='mb-8 flex flex-wrap gap-2'>
                   {post.tags.map((tag, i) => (
                     <Link
                       key={`${tag}-${i}`}
                       href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className='px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-full transition-colors hover:bg-gray-200'
+                      className='rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-200'
                     >
                       #{tag}
                     </Link>
@@ -181,7 +181,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               {/* Article Footer */}
               <footer className='text-center'>
                 <p className='mb-6 text-gray-600'>喜欢这篇文章？欢迎评论区留言！</p>
-                <div className='flex gap-4 justify-center'>
+                <div className='flex justify-center gap-4'>
                   <Button variant='outline' asChild>
                     <Link href='/blog'>← 查看更多文章</Link>
                   </Button>

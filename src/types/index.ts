@@ -63,3 +63,49 @@ export interface ContactInfo {
   location: string;
   phone?: string;
 }
+
+// SEO 相关类型定义
+export interface SEOAnalysisResult {
+  issues: string[];
+  recommendations: string[];
+  score: number;
+  metrics: {
+    titleLength: number;
+    descriptionLength: number;
+    wordCount: number;
+    imagesCount: number;
+    h1Count: number;
+    internalLinksCount: number;
+  };
+}
+
+export interface GAEventData {
+  gaId: string;
+  url: string;
+  title: string;
+  analysis: SEOAnalysisResult;
+  userAgent: string;
+  ip: string;
+}
+
+export interface GAEventParams {
+  v: string;
+  tid: string;
+  cid: string;
+  t: string;
+  ec: string;
+  ea: string;
+  el: string;
+  ev: string;
+  cd1?: string;
+  cd2?: string;
+  cd3?: string;
+  cm1?: string;
+  cm2?: string;
+  cm3?: string;
+  dp: string;
+  dt: string;
+  dh: string;
+  ua: string;
+  uip: string;
+}

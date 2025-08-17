@@ -24,12 +24,12 @@ const footerNavigation = [
 
 export function Footer() {
   return (
-    <footer className='py-16 text-white bg-gray-900'>
-      <div className='px-4 mx-auto max-w-6xl sm:px-6 lg:px-8'>
-        <div className='grid grid-cols-1 gap-8 mb-8 md:grid-cols-3'>
+    <footer className='bg-gray-900 py-16 text-white'>
+      <div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
+        <div className='mb-8 grid grid-cols-1 gap-8 md:grid-cols-3'>
           {/* Brand Section */}
           <div>
-            <div className='flex items-center mb-6 space-x-3'>
+            <div className='mb-6 flex items-center space-x-3'>
               <Logo size='lg' className='transition-transform duration-300 hover:scale-110' />
               <h3 className='text-xl font-bold'>{siteConfig.author.name}</h3>
             </div>
@@ -43,10 +43,10 @@ export function Footer() {
                     href={social.href}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='flex justify-center items-center w-10 h-10 bg-gray-800 rounded-lg transition-colors duration-200 hover:bg-gray-700'
+                    className='flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 transition-colors duration-200 hover:bg-gray-700'
                     aria-label={social.name}
                   >
-                    <IconComponent className='w-5 h-5' />
+                    <IconComponent className='h-5 w-5' />
                   </a>
                 );
               })}
@@ -72,11 +72,11 @@ export function Footer() {
             <h4 className='mb-6 font-semibold'>联系方式</h4>
             <ul className='space-y-3 text-gray-400'>
               <li className='flex items-center space-x-3'>
-                <Mail className='w-4 h-4' />
+                <Mail className='h-4 w-4' />
                 <span>{contactInfo.email}</span>
               </li>
               <li className='flex items-center space-x-3'>
-                <MapPin className='w-4 h-4' />
+                <MapPin className='h-4 w-4' />
                 <span>{contactInfo.location}</span>
               </li>
             </ul>
@@ -84,14 +84,14 @@ export function Footer() {
         </div>
 
         {/* Site Stats */}
-        <div className='pt-8 border-t border-gray-700'>
-          <div className='flex justify-center mb-4'>
+        <div className='border-t border-gray-700 pt-8'>
+          <div className='mb-4 flex justify-center'>
             <SiteStats className='text-center' />
           </div>
         </div>
 
         {/* Copyright */}
-        <div className='pt-8 text-center text-gray-400 border-t border-gray-700'>
+        <div className='border-t border-gray-700 pt-8 text-center text-gray-400'>
           <p>
             &copy; {new Date().getFullYear()} {siteConfig.author.name}. 保留所有权利。
           </p>
