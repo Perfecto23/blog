@@ -1,0 +1,336 @@
+---
+title: "Rust 与 JavaScript/TypeScript 对比"
+date: 2025-03-29T12:52:06+08:00
+updated: 2025-08-18T11:36:46+08:00
+---
+
+# Rust 与 JavaScript/TypeScript 对比
+
+# 
+
+作为前端开发者，理解 Rust 与 JavaScript/TypeScript 的异同点有助于更快掌握 Rust。本文将从多个角度对比这些语言。
+
+# 语言类型系统
+
+## 类型检查时机
+
+## 类型声明
+
+```rust
+// JavaScript - 无需类型声明
+let message = "Hello";
+message = 42; // 有效，动态类型
+
+// TypeScript - 可选的类型声明
+let message: string = "Hello";
+// message = 42; // 错误: 不能将类型'number'分配给类型'string'
+
+// Rust - 必须有类型(显式或推断)，一旦确定不可改变类型
+let message = "Hello"; // 类型推断为&str
+// message = 42; // 错误: 不匹配的类型
+```
+
+## 空值处理
+
+```
+// JavaScript/TypeScript
+let value = null;
+let userName = user?.name; // 可选链操作符
+
+// Rust - 使用Option枚举
+let value: Option<i32> = None;
+let user_name = user.map(|u| u.name); // Option上的map方法
+```
+
+# 内存管理模型
+
+## 资源管理示例
+
+```rust
+// JavaScript - 依赖垃圾回收器
+function processData() {
+  const buffer = new ArrayBuffer(1024 * 1024 * 10); // 分配10MB
+  // 使用buffer...
+} // buffer会在某个时刻被GC回收
+
+// Rust - 确定性释放
+fn process_data() {
+    let buffer = vec![0; 1024 * 1024 * 10]; // 分配10MB
+    // 使用buffer...
+} // buffer立即在此处释放
+```
+
+# 函数和闭包
+
+## 函数定义
+
+```rust
+// JavaScript
+function add(a, b) {
+  return a + b;
+}
+
+// TypeScript
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// Rust
+fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+```
+
+## 闭包
+
+```
+// JavaScript/TypeScript闭包
+const counter = () => {
+  let count = 0;
+  return () => {
+    count += 1;
+    return count;
+  };
+};
+
+const increment = counter();
+console.log(increment()); // 1
+console.log(increment()); // 2
+
+// Rust闭包
+fn counter() -> impl FnMut() -> i32 {
+    let mut count = 0;
+    move || {
+        count += 1;
+        count
+    }
+}
+
+fn main() {
+    let mut increment = counter();
+    println!("{}", increment()); // 1
+    println!("{}", increment()); // 2
+}
+```
+
+## 高阶函数
+
+```
+// JavaScript/TypeScript
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(x => x * 2);
+const evens = numbers.filter(x => x % 2 === 0);
+const sum = numbers.reduce((acc, x) => acc + x, 0);
+
+// Rust
+let numbers = vec![1, 2, 3, 4, 5];
+let doubled: Vec<i32> = numbers.iter().map(|x| x * 2).collect();
+let evens: Vec<i32> = numbers.iter().filter(|&x| x % 2 == 0).cloned().collect();
+let sum: i32 = numbers.iter().sum();
+```
+
+# 对象和数据模型
+
+## 对象/结构体
+
+```
+// JavaScript对象
+const user = {
+  name: "Alice",
+  age: 30,
+  greet() {
+    console.log(Hello, I'm ${this.name});
+  }
+};
+
+// TypeScript接口
+interface User {
+  name: string;
+  age: number;
+  greet(): void;
+}
+
+// Rust结构体
+struct User {
+    name: String,
+    age: u32,
+}
+
+impl User {
+    fn greet(&self) {
+        println!("Hello, I'm {}", self.name);
+    }
+}
+```
+
+## 继承 vs 组合
+
+```
+// JavaScript继承
+class Animal {
+  speak() { return "noise"; }
+}
+
+class Dog extends Animal {
+  speak() { return "woof"; }
+}
+
+// Rust使用trait和组合
+trait Animal {
+    fn speak(&self) -> &str;
+}
+
+struct Dog;
+
+impl Animal for Dog {
+    fn speak(&self) -> &str {
+        "woof"
+    }
+}
+```
+
+# 异步编程模型
+
+## Promise vs Future
+
+```
+// JavaScript Promise
+function fetchData() {
+  return fetch('https://api.example.com/data')
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+}
+
+// JavaScript async/await
+async function fetchData() {
+  try {
+    const response = await fetch('https://api.example.com/data');
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Rust Future和async/await
+async fn fetch_data() -> Result<(), Box<dyn Error>> {
+    let response = reqwest::get("https://api.example.com/data").await?;
+    let data = response.json::<serde_json::Value>().await?;
+    println!("{:?}", data);
+    Ok(())
+}
+```
+
+## 事件循环 vs 异步运行时
+
+```
+// JavaScript - 单一事件循环
+setTimeout(() => console.log("Later"), 1000);
+console.log("Now");
+
+// Rust - 多种异步运行时选择
+#[tokio::main]
+async fn main() {
+    tokio::spawn(async {
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        println!("Later");
+    });
+    println!("Now");
+}
+```
+
+# 错误处理
+
+## 异常 vs 返回值
+
+```rust
+// JavaScript - try/catch
+try {
+  const data = JSON.parse(invalidJson);
+} catch (error) {
+  console.error("解析错误:", error.message);
+}
+
+// TypeScript - 可以有更具体的错误类型
+try {
+  // ...
+} catch (error) {
+  if (error instanceof SyntaxError) {
+    console.error("语法错误");
+  }
+}
+
+// Rust - Result类型
+fn parse_data(input: &str) -> Result<Value, serde_json::Error> {
+    let data = serde_json::from_str(input)?;
+    Ok(data)
+}
+
+match parse_data(invalid_json) {
+    Ok(data) => println!("数据: {:?}", data),
+    Err(e) => println!("解析错误: {}", e),
+}
+```
+
+## 空值处理
+
+```rust
+// JavaScript - null/undefined检查
+function getUserName(user) {
+  return user ? user.name : "Guest";
+}
+
+// TypeScript - 可选类型
+function getUserName(user?: { name: string }): string {
+  return user?.name ?? "Guest";
+}
+
+// Rust - Option类型
+fn get_user_name(user: Option<&User>) -> &str {
+    user.map_or("Guest", |u| &u.name)
+}
+```
+
+# 模块系统
+
+## 导入和导出
+
+```rust
+// JavaScript/TypeScript - ESM模块
+// helper.js
+export function format(text) { return text.trim(); }
+export default class Helper { /* ... */ }
+
+// main.js
+import Helper, { format } from './helper.js';
+// Rust模块
+// helper.rs
+pub fn format(text: &str) -> String { text.trim().to_string() }
+pub struct Helper { /* ... */ }
+
+// main.rs
+mod helper;
+use helper::{format, Helper};
+```
+
+## 包管理
+
+# 性能特性
+
+# 开发体验
+
+# 实际应用场景对比
+
+# 总结
+
+- **JavaScript**: 灵活，动态，易学易用，但缺乏编译时保障
+- **TypeScript**: 为 JavaScript 添加类型安全，保持运行时特性
+- **Rust**: 性能和安全并重，学习曲线陡峭但回报丰厚
+
+前端开发者学习 Rust 的优势：
+
+1. 更好的性能敏感代码编写能力
+2. 通过 WebAssembly 增强 Web 应用
+3. 扩展技能到系统编程和后端开发
+4. 培养更严谨的编程思维和内存管理概念

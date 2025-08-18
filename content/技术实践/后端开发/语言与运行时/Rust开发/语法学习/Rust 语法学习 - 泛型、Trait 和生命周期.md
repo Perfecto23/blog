@@ -1,0 +1,621 @@
+---
+title: "Rust 语法学习 - 泛型、Trait 和生命周期"
+date: 2025-03-29T12:36:53+08:00
+updated: 2025-08-18T11:36:59+08:00
+---
+
+# Rust 语法学习 - 泛型、Trait 和生命周期
+
+## 8.1 泛型
+
+泛型是 Rust 的强大功能，允许定义适用于多种类型的结构体、函数和方法。
+
+### 泛型函数
+
+```rust
+// 泛型函数，T可以是任何类型
+fn largest<T: PartialOrd>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+// 使用
+let number_list = vec![34, 50, 25, 100, 65];
+let result = largest(&number_list);
+
+let char_list = vec!['y', 'm', 'a', 'q'];
+let result = largest(&char_list);
+```
+
+### 泛型结构体
+
+```rust
+// 单一泛型参数
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+// 多个泛型参数
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+// 使用
+let integer = Point { x: 5, y: 10 };
+let float = Point { x: 1.0, y: 4.0 };
+let mixed = Point { x: 5, y: 4.0 }; // 需要使用多泛型参数的版本
+```
+
+### 泛型枚举
+
+```rust
+// Option枚举
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+// Result枚举
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+### 泛型方法
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+// 为Point<T>实现方法
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+// 为特定类型实现方法
+impl Point<f32> {
+    fn distance_from_origin(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+
+// 针对多泛型参数的方法
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+impl<T, U> Point<T, U> {
+    // 方法可以使用不同于结构体的泛型参数
+    fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+        Point {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
+```
+
+### 性能考虑
+
+Rust 的泛型实现使用单态化，在编译时为每种使用的具体类型生成特定代码，无运行时开销。
+
+## 8.2 Trait: 定义共享行为
+
+Trait 类似于其他语言的接口，定义了类型可以实现的功能集合。
+
+### 定义 Trait
+
+```rust
+pub trait Summary {
+    // 必须实现的方法签名
+    fn summarize(&self) -> String;
+    // 带有默认实现的方法
+    fn default_summary(&self) -> String {
+        String::from("(Read more...)")
+    }
+}
+```
+
+### 为类型实现 Trait
+
+```
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+    // 可以选择覆盖默认实现
+    fn default_summary(&self) -> String {
+        format!("Headlines: {}", self.headline)
+    }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.username, self.content)
+    }
+    // 使用default_summary的默认实现
+}
+```
+
+### Trait 作为参数
+
+```
+// 使用impl Trait语法（适用于简单情况）
+pub fn notify(item: impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+// 使用trait bound语法（更灵活，支持复杂约束）
+pub fn notify<T: Summary>(item: T) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+// 多个trait bounds
+pub fn notify(item: impl Summary + Display) {
+    println!("Breaking news! {}", item.summarize());
+    println!("{}", item);
+}
+
+// 等价的trait bound形式
+pub fn notify<T: Summary + Display>(item: T) {
+    // ...
+}
+```
+
+### where 子句
+
+```
+// 使用where简化复杂的trait bound
+fn some_function<T, U>(t: T, u: U) -> i32
+    where T: Display + Clone,
+          U: Clone + Debug
+{
+    // ...
+}
+```
+
+### 返回实现 Trait 的类型
+
+```rust
+// 返回实现了Summary的类型
+fn returns_summarizable() -> impl Summary {
+    Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+        reply: false,
+        retweet: false,
+    }
+}
+```
+
+注意：目前 `impl Trait` 返回值仅支持返回单一具体类型，不能在不同分支返回不同类型（即使都实现了相同的 trait）。
+
+### 使用 Trait Bounds 有条件地实现方法
+
+```
+// 只为实现了Display和PartialOrd的类型实现cmp_display方法
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+```
+
+### 实现 Trait 的约束
+
+- 只能为本地类型实现本地 trait（孤儿规则）
+- 为外部类型实现外部 trait 需要用 newtype 模式
+
+```
+// 不能直接为外部类型Vec<T>实现外部trait Display
+// 使用newtype模式
+struct Wrapper(Vec<String>);
+
+impl fmt::Display for Wrapper {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[{}]", self.0.join(", "))
+    }
+}
+```
+
+### 常用标准库 Trait
+
+```
+// Copy和Clone: 控制值的复制行为
+#[derive(Copy, Clone)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+// Debug: 启用调试格式化
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+// PartialEq和Eq: 比较相等性
+#[derive(PartialEq, Eq)]
+enum BookFormat {
+    Paperback,
+    Hardback,
+    Ebook,
+}
+
+// PartialOrd和Ord: 比较排序
+#[derive(PartialOrd, Ord)]
+struct ISBN(u64);
+
+// Hash: 支持哈希
+#[derive(Hash)]
+struct ProductCode(u32);
+
+// Default: 提供默认值
+#[derive(Default)]
+struct Settings {
+    font_size: u8,
+    dark_mode: bool,
+}
+// 使用默认值
+let settings = Settings::default();
+```
+
+### 关联类型
+
+在 trait 内定义关联类型，提高代码可读性：
+
+```
+pub trait Iterator {
+    type Item; // 关联类型
+    fn next(&mut self) -> Option<Self::Item>;
+}
+
+impl Iterator for Counter {
+    type Item = u32;
+    fn next(&mut self) -> Option<Self::Item> {
+        // ...
+    }
+}
+```
+
+## 8.3 生命周期
+
+生命周期确保引用的有效性，是 Rust 借用检查器的重要部分。
+
+### 生命周期注解语法
+
+```
+&i32        // 引用
+&'a i32     // 带有显式生命周期注解的引用
+&'a mut i32 // 带有显式生命周期注解的可变引用
+```
+
+### 函数签名中的生命周期
+
+```
+// 错误：缺少生命周期注解
+fn longest(x: &str, y: &str) -> &str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+// 正确：添加了生命周期注解
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+
+### 理解生命周期注解
+
+```
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    // ...
+}
+```
+
+这告诉编译器：
+
+1. 参数 `x` 和 `y` 至少在生命周期 `'a` 内有效
+2. 返回的引用至少在生命周期 `'a` 内有效
+3. 返回引用的实际生命周期是 `x` 和 `y` 生命周期的较小者
+
+### 结构体中的生命周期
+
+```rust
+// 结构体中包含引用必须指定生命周期
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().unwrap();
+    let i = ImportantExcerpt {
+        part: first_sentence,
+    };
+}
+```
+
+### 生命周期省略规则
+
+Rust 有三条生命周期省略规则，让你在某些情况下无需显式注明生命周期：
+
+1. 每个引用参数都有自己的生命周期参数
+2. 如果只有一个输入生命周期参数，那么它被赋给所有输出生命周期参数
+3. 如果有多个输入生命周期参数，但其中一个是 `&self` 或 `&mut self`，则 `self` 的生命周期赋给所有输出生命周期参数
+
+```
+// 省略前
+fn first_word<'a>(s: &'a str) -> &'a str {}
+
+// 省略后
+fn first_word(s: &str) -> &str {}
+```
+
+### 方法定义中的生命周期
+
+```rust
+impl<'a> ImportantExcerpt<'a> {
+    // 第一条规则提供'b，第三条规则应用self的生命周期'a到返回值
+    fn announce_and_return_part(&self, announcement: &str) -> &str {
+        println!("Attention please: {}", announcement);
+        self.part
+    }
+}
+```
+
+### 静态生命周期
+
+`'static` 表示引用在整个程序运行期间都有效：
+
+```rust
+// 字符串字面值是'static的
+let s: &'static str = "I have a static lifetime.";
+```
+
+### 泛型参数、Trait Bounds 和生命周期的结合
+
+```
+use std::fmt::Display;
+
+fn longest_with_an_announcement<'a, T>(
+    x: &'a str,
+    y: &'a str,
+    ann: T,
+) -> &'a str
+where
+    T: Display,
+{
+    println!("Announcement! {}", ann);
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+
+## 8.4 高级 Trait 特性
+
+### 关联类型与类型映射
+
+```
+pub trait Iterator {
+    type Item;
+    fn next(&mut self) -> Option<Self::Item>;
+}
+```
+
+### 默认类型参数
+
+```
+// 默认类型参数
+trait Add<Rhs=Self> {
+    type Output;
+    fn add(self, rhs: Rhs) -> Self::Output;
+}
+
+// 使用自定义类型
+use std::ops::Add;
+
+#[derive(Debug, PartialEq)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Add for Point {
+    type Output = Point;
+    fn add(self, other: Point) -> Point {
+        Point {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+// 覆盖默认类型参数
+struct Millimeters(u32);
+struct Meters(u32);
+
+impl Add<Meters> for Millimeters {
+    type Output = Millimeters;
+    fn add(self, other: Meters) -> Millimeters {
+        Millimeters(self.0 + (other.0 * 1000))
+    }
+}
+```
+
+### 运算符重载
+
+```
+use std::ops::{Add, Mul};
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+struct Complex {
+    re: f64,
+    im: f64,
+}
+
+impl Add for Complex {
+    type Output = Complex;
+    fn add(self, other: Complex) -> Complex {
+        Complex {
+            re: self.re + other.re,
+            im: self.im + other.im,
+        }
+    }
+}
+
+impl Mul for Complex {
+    type Output = Complex;
+    fn mul(self, other: Complex) -> Complex {
+        Complex {
+            re: self.re * other.re - self.im * other.im,
+            im: self.re * other.im + self.im * other.re,
+        }
+    }
+}
+
+// 使用
+let a = Complex { re: 1.0, im: 2.0 };
+let b = Complex { re: 3.0, im: 4.0 };
+let c = a + b; // Complex { re: 4.0, im: 6.0 }
+let d = a * b; // Complex { re: -5.0, im: 10.0 }
+```
+
+### 完全限定语法解决方法冲突
+
+```
+trait Pilot {
+    fn fly(&self);
+}
+
+trait Wizard {
+    fn fly(&self);
+}
+
+struct Human;
+
+impl Pilot for Human {
+    fn fly(&self) {
+        println!("This is your captain speaking.");
+    }
+}
+
+impl Wizard for Human {
+    fn fly(&self) {
+        println!("Up!");
+    }
+}
+
+impl Human {
+    fn fly(&self) {
+        println!("*waving arms furiously*");
+    }
+}
+
+// 使用
+let person = Human;
+person.fly(); // 调用Human自己的方法: "*waving arms furiously*"
+Pilot::fly(&person); // 调用Pilot trait的方法: "This is your captain speaking."
+Wizard::fly(&person); // 调用Wizard trait的方法: "Up!"
+```
+
+### 父 trait (Supertraits)
+
+```
+要求实现一个trait必须先实现另一个trait：
+use std::fmt;
+
+// OutlinePrint需要先实现fmt::Display
+trait OutlinePrint: fmt::Display {
+    fn outline_print(&self) {
+        let output = self.to_string();
+        let len = output.len();
+        println!("{}", "_".repeat(len + 4));_
+*        println!("*{}_", " ".repeat(len + 2));_
+*        println!("* {} _", output);_
+*        println!("*{}_", " ".repeat(len + 2));_
+*        println!("{}", "*".repeat(len + 4));
+    }
+}
+
+// 使用
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+// 必须先实现Display
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+impl OutlinePrint for Point {}
+```
+
+### newtype 模式实现外部 trait
+
+```
+use std::fmt;
+
+// 无法直接为Vec<T>实现Display (孤儿规则)
+struct Wrapper(Vec<String>);
+
+impl fmt::Display for Wrapper {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[{}]", self.0.join(", "))
+    }
+}
+
+// 使用
+let w = Wrapper(vec![
+    String::from("hello"),
+    String::from("world")
+]);
+println!("w = {}", w); // 输出: "w = [hello, world]"
+```
